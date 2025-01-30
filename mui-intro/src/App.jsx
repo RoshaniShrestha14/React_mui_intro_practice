@@ -18,7 +18,7 @@ const App = () => {
       >
         Increase count
       </Button>
-      <Button
+      {/* <Button
         variant="contained"
         color="secondary"
         onClick={() => {
@@ -27,7 +27,7 @@ const App = () => {
         }}
       >
         Decrease count
-      </Button>
+      </Button> */}
     </Box>
   );
 };
