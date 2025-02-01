@@ -1,9 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Typography, Box, Button, TextField } from "@mui/material";
 
 const App = () => {
   const [count, setCount] = useState(0); // Initialize state for count
   const [name, setName] = useState(""); // Initialize state for name
+  const [quote, setQuote] = useState(""); // Initialize state for random quote
+
+  // Load saved data from local storage
+  useEffect(() => {
+    const savedCount = localStorage.getItem("count");
+    const savedName = localStorage.getItem("name");
+    if (savedCount) setCount(Number(savedCount));
+    if (savedName) setName(savedName);
+  }, []);
+
+  // Save data to local storage whenever the count or name changes
+  useEffect(() => {
+    localStorage.setItem("count", count);
+    localStorage.setItem("name", name);
+  }, [count, name]);
 
   const handleIncrease = () => {
     const newCount = count + 1; // Increment count
@@ -23,8 +38,20 @@ const App = () => {
     setName(event.target.value); // Update name based on input
   };
 
+  const handleGetQuote = async () => {
+    const response = await fetch("https://api.quotable.io/random");
+    const data = await response.json();
+    setQuote(data.content); // Set random quote
+  };
+
+  const getBackgroundColor = () => {
+    if (count > 0) return "lightgreen";
+    if (count < 0) return "lightcoral";
+    return "lightgray";
+  };
+
   return (
-    <Box>
+    <Box style={{ backgroundColor: getBackgroundColor(), padding: "16px" }}>
       <Typography variant="h3">{count}</Typography>
       <Typography variant="body1">
         {count % 2 === 0 ? "Even" : "Odd"} Count
@@ -40,6 +67,14 @@ const App = () => {
       />
 
       <Typography variant="h6">Hello, {name ? name : "Guest"}!</Typography>
+
+      <Typography variant="h6" style={{ marginBottom: "16px" }}>
+        {count > 10
+          ? "High Count!"
+          : count < -10
+          ? "Low Count!"
+          : "Normal Count"}
+      </Typography>
 
       <Button
         variant="contained"
@@ -60,6 +95,21 @@ const App = () => {
       <Button variant="outlined" color="default" onClick={handleReset}>
         Reset count
       </Button>
+
+      <Button
+        variant="contained"
+        color="info"
+        onClick={handleGetQuote}
+        style={{ marginTop: "16px", marginBottom: "16px" }}
+      >
+        Get a Random Quote
+      </Button>
+
+      {quote && (
+        <Typography variant="body1" style={{ fontStyle: "italic" }}>
+          "{quote}"
+        </Typography>
+      )}
     </Box>
   );
 };
